@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oaec.cms.mapper.PermissionMapper">
+    <!--    <select id="queryPermissionByRoleId" resultType="permission">
+            SELECT permission.* FROM  admin_role,role_permission,permission WHERE admin_role.role_id = role_permission.role_id and role_permission.permission_id = permission.permission_id and admin_role.admin_id = #{adminId}  </select>-->
+    <select id="query" parameterType="map" resultType="permission">
+        SELECT *
+        FROM permission
+        <if test="name!=null">
+            WHERE permission like CONCAT('%',#{name},'%')
+        </if>
+        order by type
+    </select>
+
+    <select id="queryPermissionLevle1" resultMap="adminPermissionList">
+        SELECT DISTINCT permission.*, role.role_id
+        FROM permission,
+             role_permission,
+             role,
+             admin_role
+        WHERE admin_role.role_id = role.role_id
+          and role.role_id = role_permission.role_id
+          and role_permission.permission_id = permission.permission_id
+          and permission.status = 1
+          and parent_id = 0
+
+          and admin_role.admin_id = #{adminId}
+    </select>
+
+    <select id="queryPermissionLevle2" resultType="permission">
+        SELECT permission.*
+        FROM permission,
+             role_permission
+        WHERE permission.permission_id = role_permission.permission_id
+          and permission.status = 1
+          and parent_id = #{permissionId}
+          and role_id = #{roleId}
+    </select>
+
+    <resultMap id="adminPermissionList" type="map">
+        <id column="permission_id" property="permissionId"/>
+        <collection property="permissionList" ofType="map"
+                    select="queryPermissionLevle2" column="{permissionId =permission_id,roleId = role_id }">
+        </collection>
+    </resultMap>
+
+
+    <select id="queryPermissionLevle1List" resultMap="permissionList">
+        SELECT *
+        FROM permission
+        WHERE parent_id = 0
+          AND status = 1
+    </select>
+
+    <select id="queryPermissionLevle2List" resultType="permission">
+        SELECT *
+        FROM permission
+        WHERE status = 1
+          and parent_id = #{permissionId}
+    </select>
+
+    <resultMap id="permissionList" type="permission">
+        <id column="permission_id" property="permissionId"/>
+        <collection property="permissionList" ofType="permission"
+                    select="queryPermissionLevle2List" column="permission_id">
+        </collection>
+    </resultMap>
+
+    <update id="doEditStatus" parameterType="map">
+        UPDATE permission
+        <set>
+            <if test="status==1">
+                status = 0
+            </if>
+            <if test="status==0">
+                status = 1
+            </if>
+        </set>
+        WHERE permission_id = #{permissionId}
+    </update>
+    <insert id="doInsert" parameterType="permission">
+        INSERT INTO permission(parent_id, permission, url, type) VALUES (#{parentId},#{permission},#{url},#{type})
+    </insert>
+    <update id="doUpdate" parameterType="permission">
+        UPDATE permission SET parent_id = #{parentId},permission=#{permission},url=#{url},type=#{type} WHERE permission_id = #{permissionId}
+    </update>
+</mapper>

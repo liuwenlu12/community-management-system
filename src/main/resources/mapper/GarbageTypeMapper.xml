@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oaec.cms.mapper.GarbageTypeMapper">
+    <select id="query" parameterType="map" resultType="garbageType">
+        SELECT * FROM garbage_type
+        <if test="name!=null">
+            WHERE  name like CONCAT('%',#{name},'%')
+        </if>
+        <if test="status!=null">
+            WHERE status = 1
+        </if>
+    </select>
+    <update id="doUpdate">
+        UPDATE garbage_type SET name = #{name},description=#{description} WHERE garbage_type_id = #{garbageTypeId}
+    </update>
+    <insert id="doInsert">
+        INSERT INTO garbage_type(name, description) VALUES (#{name},#{description})
+    </insert>
+    <update id="doEditStatus" parameterType="map">
+        UPDATE garbage_type
+        <set>
+            <if test="status==1">
+                status = 0
+            </if>
+            <if test="status==0">
+                status = 1
+            </if>
+        </set>
+        WHERE garbage_type_id = #{garbageTypeId}
+    </update>
+
+</mapper>

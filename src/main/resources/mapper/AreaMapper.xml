@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oaec.cms.mapper.AreaMapper">
+<select id="queryByName" resultType="area">
+    SELECT * FROM area WHERE name = #{name} AND status = 1
+</select>
+    <select id="query" parameterType="map" resultType="area">
+        SELECT * FROM area
+        <if test="name!=null">
+            WHERE  name like CONCAT('%',#{name},'%')
+        </if>
+        <if test="status!=null">
+            WHERE status = 1
+        </if>
+    </select>
+    <insert id="doInsert" parameterType="area">
+        INSERT INTO area(name) values (#{name})
+    </insert>
+    <update id="doDelete">
+        UPDATE area SET status = 0 WHERE area_id = #{areaId}
+    </update>
+    <update id="doNotDelete">
+        UPDATE area SET status = 1 WHERE area_id = #{areaId}
+    </update>
+    <update id="doUpdate">
+        UPDATE area SET name=#{name} WHERE area_id = #{areaId}
+    </update>
+</mapper>

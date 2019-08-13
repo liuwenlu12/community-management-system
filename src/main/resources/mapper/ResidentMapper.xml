@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oaec.cms.mapper.ResidentMapper">
+    <select id="query" parameterType="map" resultType="resident">
+        SELECT resident.*,area.name areaName FROM resident,area WHERE resident.area_id=area.area_id AND resident.status = 1
+        <if test="name!=null">
+            AND resident.name like CONCAT('%',#{name},'%')
+        </if>
+        order by resident.area_id
+    </select>
+    <insert id="doInsert" parameterType="resident" >
+        INSERT INTO resident (name, tel_number, address, area_id) VALUES (#{name},#{telNumber},#{address},#{areaId})
+    </insert>
+    <update id="doDelete">
+        UPDATE resident SET status = 0 WHERE resident_id = #{residentId} AND status = 1
+    </update>
+    <update id="doUpdate">
+        UPDATE resident SET name=#{name},tel_number=#{telNumber},address=#{address},area_id=#{areaId} WHERE resident_id = #{residentId} and status = 1
+    </update>
+    <select id="queryDel" parameterType="map" resultType="resident">
+        SELECT resident.*,area.name areaName FROM resident,area WHERE resident.area_id=area.area_id AND resident.status = 0
+        <if test="name!=null">
+            AND resident.name like CONCAT('%',#{name},'%')
+        </if>
+    </select>
+    <update id="doRecover">
+        UPDATE resident SET status = 1 WHERE resident_id = #{residentId}
+    </update>
+</mapper>

@@ -1,0 +1,19 @@
+server:
+  port: 8666
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/bms?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: 123456
+  thymeleaf:
+    cache: false
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.oaec.cms.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com.oaec.cms: debug
